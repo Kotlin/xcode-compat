@@ -41,9 +41,6 @@ open class KotlinXcodeExtension(private val project: Project) {
             binaries.framework {
                 configure()
                 setupTask()
-                compilations["main"].cinterops {
-                    libcurl
-                }
             }
         }
     }

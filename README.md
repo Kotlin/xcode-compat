@@ -1,4 +1,10 @@
-# gradle-plugin
+[![JetBrains incubator project](https://jb.gg/badges/incubator.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
+
+# Kotlin Xcode compatibility Gradle plugin
+
+The plugin is used by [AppCode](https://jetbrains.com/appcode) to set up Kotlin/Native project along with Xcode
+
+# Sources
 
 A multi-build sample with:
 
@@ -10,3 +16,8 @@ Run with:
     ./gradlew consumer
 
 This will build and publish the Gradle `plugin` locally ; and then run the task contributed by this plugin in the `consumer` build. 
+
+# License
+
+Apache 2.0. See LICENSE file in the repostiory for details
+

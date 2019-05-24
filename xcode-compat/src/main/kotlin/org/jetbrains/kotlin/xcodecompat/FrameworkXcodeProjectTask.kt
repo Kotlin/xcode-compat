@@ -21,6 +21,12 @@ open class FrameworkXcodeProjectTask : DefaultTask() {
     @OutputDirectory
     val outputDirectory: File = project.projectDir.resolve("xcodeproj")
 
+    private val xcodeprojDirectory get() = outputDirectory.resolve(frameworkName + ".xcodeproj")
+    private val xcodeSourceRoot get() = outputDirectory
+
+    private fun File.toXcodeBuildScriptRelative(): String =
+            "\$SRCROOT/${this.toRelativeString(base = xcodeSourceRoot)}"
+
     @TaskAction
     fun generate() {
         val gradleWrapper = (project.rootProject.tasks.getByName("wrapper") as? Wrapper)?.scriptFile
@@ -61,7 +67,15 @@ open class FrameworkXcodeProjectTask : DefaultTask() {
             </plist>
         """.trimIndent())
 
-        val xcodeprojDirectory = outputDirectory.resolve(frameworkName + ".xcodeproj")
+        val gradleTaskFqName = buildString {
+            append(project.path)
+            if (!endsWith(':')) append(':')
+            append(gradleTaskName)
+        }
+
+        val gradleWrapperForScript = gradleWrapper.toXcodeBuildScriptRelative()
+        val projectDirForScript = project.projectDir.toXcodeBuildScriptRelative()
+
         val bundleIdentifier: String = projectGroup.let { if (it.isEmpty()) frameworkName else "$it.$frameworkName" }
 
         xcodeprojDirectory.mkdirs()
@@ -150,7 +164,7 @@ open class FrameworkXcodeProjectTask : DefaultTask() {
                         );
                         runOnlyForDeploymentPostprocessing = 0;
                         shellPath = /bin/sh;
-                        shellScript = "\"$gradleWrapper\" -p \"${project.projectDir}\" \"$gradleTaskName\"\n";
+                        shellScript = "\"$gradleWrapperForScript\" -p \"$projectDirForScript\" \"$gradleTaskFqName\"\n";
                     };
             /* End PBXShellScriptBuildPhase section */
 

@@ -150,7 +150,7 @@ open class FrameworkXcodeProjectTask : DefaultTask() {
                         );
                         runOnlyForDeploymentPostprocessing = 0;
                         shellPath = /bin/sh;
-                        shellScript = "\"${project.rootDir}/gradlew\" -p \"${project.projectDir}\" \"$gradleTaskName\"\n";
+                        shellScript = "\"$gradleWrapper\" -p \"${project.projectDir}\" \"$gradleTaskName\"\n";
                     };
             /* End PBXShellScriptBuildPhase section */
 

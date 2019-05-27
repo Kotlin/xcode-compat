@@ -6,6 +6,7 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.wrapper.Wrapper
 import java.io.File
+import java.security.MessageDigest
 
 open class FrameworkXcodeProjectTask : DefaultTask() {
 
@@ -78,6 +79,25 @@ open class FrameworkXcodeProjectTask : DefaultTask() {
 
         val bundleIdentifier: String = projectGroup.let { if (it.isEmpty()) frameworkName else "$it.$frameworkName" }
 
+        // Trivial effort to make IDs unique but stable:
+        val ids = generateSequence(0) { it + 1 }
+                .map { "$frameworkName:$it".sha256().substring(0, 24) }
+                .distinct()
+                .iterator()
+
+        val mainGroupID = ids.next()
+        val productsGroupID = ids.next()
+        val frameworkFileID = ids.next()
+        val targetID = ids.next()
+        val scriptBuildPhaseID = ids.next()
+        val targetBuildConfigurationListID = ids.next()
+        val targetDebugBuildConfigurationID = ids.next()
+        val targetReleaseBuildConfigurationID = ids.next()
+        val projectBuildConfigurationListID = ids.next()
+        val projectDebugBuildConfigurationID = ids.next()
+        val projectReleaseBuildConfigurationID = ids.next()
+        val projectID = ids.next()
+
         xcodeprojDirectory.mkdirs()
         xcodeprojDirectory.resolve("project.pbxproj").writeText("""
             // !${'$'}*UTF8*${'$'}!
@@ -89,21 +109,21 @@ open class FrameworkXcodeProjectTask : DefaultTask() {
                 objects = {
 
             /* Begin PBXFileReference section */
-                    62E985139ABA658F4C6C577F /* $frameworkName.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = $frameworkName.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+                    $frameworkFileID /* $frameworkName.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = $frameworkName.framework; sourceTree = BUILT_PRODUCTS_DIR; };
             /* End PBXFileReference section */
 
             /* Begin PBXGroup section */
-                    62E98571159A645898E04E2C = {
+                    $mainGroupID = {
                         isa = PBXGroup;
                         children = (
-                            62E98FF247DD31C30C7F51BC /* Products */,
+                            $productsGroupID /* Products */,
                         );
                         sourceTree = "<group>";
                     };
-                    62E98FF247DD31C30C7F51BC /* Products */ = {
+                    $productsGroupID /* Products */ = {
                         isa = PBXGroup;
                         children = (
-                            62E985139ABA658F4C6C577F /* $frameworkName.framework */,
+                            $frameworkFileID /* $frameworkName.framework */,
                         );
                         name = Products;
                         sourceTree = "<group>";
@@ -111,11 +131,11 @@ open class FrameworkXcodeProjectTask : DefaultTask() {
             /* End PBXGroup section */
 
             /* Begin PBXNativeTarget section */
-                    62E987E2F8F8FF10F3D97DD0 /* $frameworkName */ = {
+                    $targetID /* $frameworkName */ = {
                         isa = PBXNativeTarget;
-                        buildConfigurationList = 62E9800271F3022AE71848BC /* Build configuration list for PBXNativeTarget "$frameworkName" */;
+                        buildConfigurationList = $targetBuildConfigurationListID /* Build configuration list for PBXNativeTarget "$frameworkName" */;
                         buildPhases = (
-                            62E98962EFB3E11B7F39A707 /* Compile Kotlin/Native */,
+                            $scriptBuildPhaseID /* Compile Kotlin/Native */,
                         );
                         buildRules = (
                         );
@@ -123,36 +143,36 @@ open class FrameworkXcodeProjectTask : DefaultTask() {
                         );
                         name = $frameworkName;
                         productName = $frameworkName;
-                        productReference = 62E985139ABA658F4C6C577F /* $frameworkName.framework */;
+                        productReference = $frameworkFileID /* $frameworkName.framework */;
                         productType = "com.apple.product-type.framework";
                     };
             /* End PBXNativeTarget section */
 
             /* Begin PBXProject section */
-                    62E9824CD21C2C5BD25EFCA3 /* Project object */ = {
+                    $projectID /* Project object */ = {
                         isa = PBXProject;
                         attributes = {
                             ORGANIZATIONNAME = Kotlin/Native;
                         };
-                        buildConfigurationList = 62E9828C6A9CD86C92ADBAAB /* Build configuration list for PBXProject "$frameworkName" */;
+                        buildConfigurationList = $projectBuildConfigurationListID /* Build configuration list for PBXProject "$frameworkName" */;
                         compatibilityVersion = "Xcode 3.2";
                         developmentRegion = English;
                         hasScannedForEncodings = 0;
                         knownRegions = (
                             en,
                         );
-                        mainGroup = 62E98571159A645898E04E2C;
-                        productRefGroup = 62E98FF247DD31C30C7F51BC /* Products */;
+                        mainGroup = $mainGroupID;
+                        productRefGroup = $productsGroupID /* Products */;
                         projectDirPath = "";
                         projectRoot = "";
                         targets = (
-                            62E987E2F8F8FF10F3D97DD0 /* $frameworkName */,
+                            $targetID /* $frameworkName */,
                         );
                     };
             /* End PBXProject section */
 
             /* Begin PBXShellScriptBuildPhase section */
-                    62E98962EFB3E11B7F39A707 /* Compile Kotlin/Native */ = {
+                    $scriptBuildPhaseID /* Compile Kotlin/Native */ = {
                         isa = PBXShellScriptBuildPhase;
                         buildActionMask = 2147483647;
                         files = (
@@ -169,7 +189,7 @@ open class FrameworkXcodeProjectTask : DefaultTask() {
             /* End PBXShellScriptBuildPhase section */
 
             /* Begin XCBuildConfiguration section */
-                    62E982B13330DD0D28B667BB /* Debug */ = {
+                    $targetDebugBuildConfigurationID /* Debug */ = {
                         isa = XCBuildConfiguration;
                         buildSettings = {
                             CODE_SIGN_IDENTITY = "";
@@ -185,7 +205,7 @@ open class FrameworkXcodeProjectTask : DefaultTask() {
                         };
                         name = Debug;
                     };
-                    62E98522A6998905313A73C1 /* Release */ = {
+                    $projectReleaseBuildConfigurationID /* Release */ = {
                         isa = XCBuildConfiguration;
                         buildSettings = {
                             ALWAYS_SEARCH_USER_PATHS = NO;
@@ -238,7 +258,7 @@ open class FrameworkXcodeProjectTask : DefaultTask() {
                         };
                         name = Release;
                     };
-                    62E98BEAF3266BD5F933191F /* Release */ = {
+                    $targetReleaseBuildConfigurationID /* Release */ = {
                         isa = XCBuildConfiguration;
                         buildSettings = {
                             CODE_SIGN_IDENTITY = "";
@@ -254,7 +274,7 @@ open class FrameworkXcodeProjectTask : DefaultTask() {
                         };
                         name = Release;
                     };
-                    62E98F0EC52020C85A402CCB /* Debug */ = {
+                    $projectDebugBuildConfigurationID /* Debug */ = {
                         isa = XCBuildConfiguration;
                         buildSettings = {
                             ALWAYS_SEARCH_USER_PATHS = NO;
@@ -316,27 +336,32 @@ open class FrameworkXcodeProjectTask : DefaultTask() {
             /* End XCBuildConfiguration section */
 
             /* Begin XCConfigurationList section */
-                    62E9800271F3022AE71848BC /* Build configuration list for PBXNativeTarget "$frameworkName" */ = {
+                    $targetBuildConfigurationListID /* Build configuration list for PBXNativeTarget "$frameworkName" */ = {
                         isa = XCConfigurationList;
                         buildConfigurations = (
-                            62E982B13330DD0D28B667BB /* Debug */,
-                            62E98BEAF3266BD5F933191F /* Release */,
+                            $targetDebugBuildConfigurationID /* Debug */,
+                            $targetReleaseBuildConfigurationID /* Release */,
                         );
                         defaultConfigurationIsVisible = 0;
                     };
-                    62E9828C6A9CD86C92ADBAAB /* Build configuration list for PBXProject "$frameworkName" */ = {
+                    $projectBuildConfigurationListID /* Build configuration list for PBXProject "$frameworkName" */ = {
                         isa = XCConfigurationList;
                         buildConfigurations = (
-                            62E98F0EC52020C85A402CCB /* Debug */,
-                            62E98522A6998905313A73C1 /* Release */,
+                            $projectDebugBuildConfigurationID /* Debug */,
+                            $projectReleaseBuildConfigurationID /* Release */,
                         );
                         defaultConfigurationIsVisible = 0;
                         defaultConfigurationName = Release;
                     };
             /* End XCConfigurationList section */
                 };
-                rootObject = 62E9824CD21C2C5BD25EFCA3 /* Project object */;
+                rootObject = $projectID /* Project object */;
             }
         """.trimIndent())
     }
 }
+
+fun String.sha256(): String =
+        sha256MessageDigest.digest(this.toByteArray()).joinToString("") { "%02X".format(it) }
+
+private val sha256MessageDigest = MessageDigest.getInstance("SHA-256")

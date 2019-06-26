@@ -8,6 +8,7 @@ import org.gradle.kotlin.dsl.task
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
+import java.io.File
 
 
 open class KotlinXcodeExtension(private val project: Project) {
@@ -28,10 +29,23 @@ open class KotlinXcodeExtension(private val project: Project) {
         val buildType = NativeBuildType.valueOf(System.getenv("CONFIGURATION")?.toUpperCase()
                 ?: "DEBUG")
         if (this.buildType == buildType) {
+            var dsymTask: Sync? = null
+
+            if (buildType == NativeBuildType.DEBUG) {
+                dsymTask = project.task<Sync>("buildForXcodeDSYM") {
+                    dependsOn(linkTask)
+                    val outputFile = linkTask.outputFile.get()
+                    val outputDSYM = File(outputFile.parent, outputFile.name + ".dSYM")
+                    from(outputDSYM)
+                    into(File(System.getenv("CONFIGURATION_BUILD_DIR"), outputDSYM.name))
+                }
+            }
+
             project.task<Sync>("buildForXcode") {
-                dependsOn(linkTask)
-                from(linkTask.outputFile.get().parentFile)
-                into(System.getenv("CONFIGURATION_BUILD_DIR"))
+                dependsOn(dsymTask ?: linkTask)
+                val outputFile = linkTask.outputFile.get()
+                from(outputFile)
+                into(File(System.getenv("CONFIGURATION_BUILD_DIR"), outputFile.name))
             }
         }
     }

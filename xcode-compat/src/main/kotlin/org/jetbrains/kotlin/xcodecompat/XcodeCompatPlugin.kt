@@ -41,11 +41,27 @@ open class KotlinXcodeExtension(private val project: Project) {
                 }
             }
 
-            project.task<Sync>("buildForXcode") {
+            val buildForXcodeTask = project.task<Sync>("buildForXcode") {
                 dependsOn(dsymTask ?: linkTask)
                 val outputFile = linkTask.outputFile.get()
                 from(outputFile)
                 into(File(System.getenv("CONFIGURATION_BUILD_DIR"), outputFile.name))
+            }
+
+            if (this.outputKind == NativeOutputKind.FRAMEWORK) {
+                setupFrameworkXcodeProjectTask(buildForXcodeTask, this.baseName)
+            }
+        }
+    }
+
+    private fun setupFrameworkXcodeProjectTask(buildForXcodeTask: Sync, frameworkName: String) {
+        project.task<FrameworkXcodeProjectTask>("xcodeproj") {
+            this.frameworkName = frameworkName
+            this.gradleTaskName = buildForXcodeTask.name
+
+            val generateWrapper = project.findProperty(GENERATE_WRAPPER_PROPERTY)?.toString()?.toBoolean() ?: false
+            if (generateWrapper) {
+                dependsOn(":wrapper")
             }
         }
     }
@@ -68,6 +84,8 @@ open class KotlinXcodeExtension(private val project: Project) {
         }
     }
 }
+
+const val GENERATE_WRAPPER_PROPERTY = "org.jetbrains.kotlin.xcodecompat.generate.wrapper"
 
 open class XcodeCompatPlugin : Plugin<Project> {
     override fun apply(project: Project) {

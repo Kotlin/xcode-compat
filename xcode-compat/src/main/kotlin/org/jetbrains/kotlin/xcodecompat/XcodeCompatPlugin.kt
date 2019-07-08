@@ -45,7 +45,7 @@ open class KotlinXcodeExtension(private val project: Project) {
                 dependsOn(dsymTask ?: linkTask)
                 val outputFile = linkTask.outputFile.get()
                 from(outputFile)
-                if (outputFile.isDirectory) {
+                if (outputKind == NativeOutputKind.FRAMEWORK) {
                     into(File(System.getenv("CONFIGURATION_BUILD_DIR"), outputFile.name))
                 }
                 else {

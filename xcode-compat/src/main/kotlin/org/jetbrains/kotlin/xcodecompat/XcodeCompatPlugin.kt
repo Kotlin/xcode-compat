@@ -29,20 +29,16 @@ open class KotlinXcodeExtension(private val project: Project) {
         val buildType = NativeBuildType.valueOf(System.getenv("CONFIGURATION")?.toUpperCase()
                 ?: "DEBUG")
         if (this.buildType == buildType) {
-            var dsymTask: Sync? = null
-
-            if (buildType == NativeBuildType.DEBUG) {
-                dsymTask = project.task<Sync>("buildForXcodeDSYM") {
-                    dependsOn(linkTask)
-                    val outputFile = linkTask.outputFile.get()
-                    val outputDSYM = File(outputFile.parent, outputFile.name + ".dSYM")
-                    from(outputDSYM)
-                    into(File(System.getenv("CONFIGURATION_BUILD_DIR"), outputDSYM.name))
-                }
+            val dsymTask = project.task<Sync>("buildForXcodeDSYM") {
+                dependsOn(linkTask)
+                val outputFile = linkTask.outputFile.get()
+                val outputDSYM = File(outputFile.parent, outputFile.name + ".dSYM")
+                from(outputDSYM)
+                into(File(System.getenv("CONFIGURATION_BUILD_DIR"), outputDSYM.name))
             }
 
             val buildForXcodeTask = project.task<Sync>("buildForXcode") {
-                dependsOn(dsymTask ?: linkTask)
+                dependsOn(dsymTask)
                 val outputFile = linkTask.outputFile.get()
                 from(outputFile)
                 if (outputKind == NativeOutputKind.FRAMEWORK) {

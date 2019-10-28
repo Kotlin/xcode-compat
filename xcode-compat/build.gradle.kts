@@ -23,7 +23,9 @@ dependencies {
 }
 
 publishing {
-    repositories {}
+    repositories {
+        maven("$buildDir/repository")
+    }
 }
 
 repositories {

@@ -1,5 +1,7 @@
 pluginManagement {
     repositories {
-        maven { url = uri("../plugin/build/repository") }
+        jcenter()
+        maven("http://dl.bintray.com/kotlin/kotlin-eap")
+        maven { url = uri("../xcode-compat/build/repository") }
     }
 }

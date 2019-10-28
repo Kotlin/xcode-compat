@@ -19,17 +19,16 @@ gradlePlugin {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin", "kotlin-gradle-plugin", "1.3.20")
+    implementation("org.jetbrains.kotlin", "kotlin-gradle-plugin", "1.3.60+")
 }
 
 publishing {
-    repositories {
-        
-    }
+    repositories {}
 }
 
 repositories {
     jcenter()
+    maven("http://dl.bintray.com/kotlin/kotlin-eap")
 }
 
 

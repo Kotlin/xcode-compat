@@ -10,9 +10,8 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
 import java.io.File
 
-
 open class KotlinXcodeExtension(private val project: Project) {
-    private fun KotlinMultiplatformExtension.presetFromXcode(): KotlinNativeTargetPreset {
+    private fun <T : KotlinNativeTarget> KotlinMultiplatformExtension.presetFromXcode(): AbstractKotlinNativeTargetPreset<T> {
         val sdkName = System.getenv("SDK_NAME") ?: "iosX64"
         val presetName = with(sdkName) {
             when {
@@ -22,7 +21,7 @@ open class KotlinXcodeExtension(private val project: Project) {
                 else -> "iosX64"
             }
         }
-        return presets.withType<KotlinNativeTargetPreset>()[presetName]
+        return presets.withType<AbstractKotlinNativeTargetPreset<T>>()[presetName]
     }
 
     private fun NativeBinary.setupTask() {

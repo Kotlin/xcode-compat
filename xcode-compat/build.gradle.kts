@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "org.jetbrains.kotlin.xcode-compat"
-version = "0.2.4"
+version = "0.2.5"
 
 val PLUGIN_NAME = "xcode-compat"
 

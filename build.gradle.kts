@@ -1,13 +1,13 @@
 tasks {
 
     val plugin by registering(GradleBuild::class) {
-        dir = file("plugin")
+        dir = file("xcode-compat")
         tasks = listOf("publish")
     }
 
     val consumer by registering(GradleBuild::class) {
         dir = file("consumer")
-        tasks = listOf("myCopyTask")
+        tasks = listOf("buildForXcode")
     }
 
     consumer {

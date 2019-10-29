@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "org.jetbrains.kotlin.xcode-compat"
-version = "0.2.4"
+version = "0.2.5"
 
 val PLUGIN_NAME = "xcode-compat"
 
@@ -19,17 +19,18 @@ gradlePlugin {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin", "kotlin-gradle-plugin", "1.3.20")
+    compileOnly("org.jetbrains.kotlin", "kotlin-gradle-plugin", "1.3.60+")
 }
 
 publishing {
     repositories {
-        
+        maven("$buildDir/repository")
     }
 }
 
 repositories {
     jcenter()
+    maven("http://dl.bintray.com/kotlin/kotlin-eap")
 }
 
 

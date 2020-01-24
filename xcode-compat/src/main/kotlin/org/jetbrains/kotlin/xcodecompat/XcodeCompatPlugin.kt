@@ -24,7 +24,7 @@ open class KotlinXcodeExtension(private val project: Project) {
         return presets.withType<AbstractKotlinNativeTargetPreset<T>>()[presetName]
     }
 
-    private fun NativeBinary.setupTask() {
+    fun NativeBinary.setupTask() {
         val buildType = NativeBuildType.valueOf(System.getenv("CONFIGURATION")?.toUpperCase()
                 ?: "DEBUG")
         if (this.buildType == buildType) {

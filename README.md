@@ -1,4 +1,4 @@
-[![JetBrains incubator project](https://jb.gg/badges/incubator.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
+[![Obsolete project](https://jb.gg/badges/obsolete.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
 
 # Kotlin Xcode compatibility Gradle plugin
 
